@@ -346,7 +346,7 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
                 try:
                     json_msg = await child_queue.get()
                     logger.info(
-                        f"Processing subprocess queue message: {json.dumps(json_msg)[:100]}..."
+                        f"Processing subprocess queue message: {json.dumps(json_msg)}..."
                     )
 
                     await gateway_client.send(json_msg)
@@ -359,9 +359,8 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
         async def forward_gateway_to_child(message: Any, _: Optional[str]):
             """Forward gateway messages to subprocess"""
             if proc and proc.stdin:
-                logger.info(f"Gateway → Subprocess: {json.dumps(message)[:100]}...")
-
                 message_str = json.dumps(message)
+                logger.info(f"Gateway → Subprocess: {message_str}...")
                 try:
                     # Ensure message ends with newline
                     if not message_str.endswith("\n"):

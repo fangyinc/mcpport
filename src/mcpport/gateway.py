@@ -10,6 +10,7 @@ import uvicorn
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.tools.base import Tool
 from mcp.server.sse import SseServerTransport
+from mcp.shared.version import SUPPORTED_PROTOCOL_VERSIONS
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.routing import Mount, Route, WebSocketRoute
@@ -155,7 +156,6 @@ class MCPGateway:
 
             # Wait 5 seconds, then send initialization request
             logger.info("Waiting 5 seconds before sending initialization request")
-            await asyncio.sleep(5)
 
             # Send initialization request
             logger.info(f"Sending initialization request to server {server_id}")
@@ -176,8 +176,24 @@ class MCPGateway:
                     json.dumps({"status": "error", "message": "Initialization failed"})
                 )
                 return
+            protocol_version = init_result.get("protocolVersion")
+            if protocol_version not in SUPPORTED_PROTOCOL_VERSIONS:
+                raise ValueError(
+                    f"Unsupported protocol version from the server: {protocol_version}"
+                )
 
             logger.info(f"Server {server_id} initialized successfully: {init_result}")
+            # Then Send notifications/initialized
+            await websocket.send_text(
+                json.dumps(
+                    {
+                        "jsonrpc": "2.0",
+                        "method": "notifications/initialized",
+                        "params": {},
+                    }
+                )
+            )
+            await asyncio.sleep(5)
 
             # Get server tools list
             logger.info(f"Requesting tools list from server {server_id}")
@@ -520,7 +536,7 @@ class MCPGateway:
                     pass_context = (
                         {self.context_kwarg: context}
                         if self.context_kwarg is not None
-                        else None,
+                        else None
                     )
                     arguments |= pass_context or {}
                     try:
@@ -665,11 +681,13 @@ class MCPGateway:
             log_level=self.settings.log_level.lower(),
         )
         # Add IPv6 dual-stack configuration
-        if hasattr(self.settings, 'ipv6') and self.settings.ipv6:
+        if hasattr(self.settings, "ipv6") and self.settings.ipv6:
             # Enable dual-stack sockets
-            socket_config = {"socket_kwargs": {"family": socket.AF_INET6, "dualstack_ipv6": True}}
+            socket_config = {
+                "socket_kwargs": {"family": socket.AF_INET6, "dualstack_ipv6": True}
+            }
             for key, value in socket_config.items():
                 setattr(config, key, value)
-                
+
         server = uvicorn.Server(config)
         await server.serve()
