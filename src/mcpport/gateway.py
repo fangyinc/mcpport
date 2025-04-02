@@ -399,7 +399,11 @@ class MCPGateway:
             return
 
     async def send_request_to_server(
-        self, server_id: str, method: str, params: Dict[str, Any]
+        self,
+        server_id: str,
+        method: str,
+        params: Dict[str, Any],
+        timeout: Optional[int] = None,
     ) -> Any:
         """Send request to specified server and wait for response"""
         if server_id not in self.registered_servers:
@@ -435,8 +439,9 @@ class MCPGateway:
             )
             await websocket.send_text(request_str)
 
+            timeout = timeout or self.settings.timeout_rpc
             # Wait for response with timeout
-            return await asyncio.wait_for(future, timeout=10.0)
+            return await asyncio.wait_for(future, timeout=timeout)
         except asyncio.TimeoutError:
             logger.error(f"Request {method} timed out")
             response_task.cancel()
@@ -526,6 +531,7 @@ class MCPGateway:
             )
 
             send_func = self.send_request_to_server
+            timeout = self.settings.timeout_run_tool
 
             class WrappedTool(Tool):
                 async def run(
@@ -545,6 +551,7 @@ class MCPGateway:
                             server_id,
                             "tools/call",
                             {"name": tool_name, "arguments": arguments},
+                            timeout=timeout,
                         )
 
                         if not result:

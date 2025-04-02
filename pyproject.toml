@@ -1,10 +1,13 @@
 [project]
 name = "mcpport"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1.1"
+description = "mcpport — A lightweight gateway &amp; registry for Model Context Protocol (MCP), enabling standardized connectivity for AI applications."
 readme = "README.md"
-requires-python = ">=3.11"
-
+license = "MIT"
+authors = [
+    { name = "fangyinc", email = "staneyffer@gmail.com"}
+]
+requires-python = ">=3.10"
 dependencies = [
     "flask>=3.1.0",
     "flask-cors>=5.0.1",
@@ -18,8 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mcpports = "mcpport.run:main"
-mcpport = "mcpport.client:main"
+mcpport = "mcpport.run:main"
 
 [build-system]
 requires = ["hatchling"]

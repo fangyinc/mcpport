@@ -13,7 +13,6 @@ Usage example:
         --server-name="my-client"
 """
 
-import argparse
 import asyncio
 import json
 import logging
@@ -21,41 +20,15 @@ import signal
 import sys
 import threading
 import uuid
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from typing import Any, Awaitable, Callable, Dict, Optional
 
 import websockets
 from websockets.legacy.client import WebSocketClientProtocol
 from werkzeug.serving import make_server
 
-from mcpport.utils import setup_logger
+from mcpport.types import StdioToWsArgs
 
 logger = logging.getLogger(__name__)
-
-
-class StdioToWsArgs:
-    """Data class for command line arguments"""
-
-    def __init__(
-        self,
-        stdio_cmd: str,
-        gateway_url: str,
-        port: int = 0,  # 0 means don't start local WebSocket server
-        message_path: str = "/ws",
-        enable_cors: bool = False,
-        health_endpoints: List[str] = None,
-        server_name: str = "mcp-stdio-gateway",
-        server_id: Optional[str] = None,
-        require_gateway: bool = True,
-    ):
-        self.stdio_cmd = stdio_cmd
-        self.port = port
-        self.message_path = message_path
-        self.enable_cors = enable_cors
-        self.health_endpoints = health_endpoints or []
-        self.gateway_url = gateway_url
-        self.server_name = server_name
-        self.server_id = server_id
-        self.require_gateway = require_gateway
 
 
 def on_signals(cleanup_func: Callable[[], None]) -> None:
@@ -264,7 +237,7 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
             """Read from subprocess stdout and parse JSON messages"""
             logger.info("Starting to read from subprocess stdout...")
 
-            buffer = ""
+            buffer = b""  # Use bytes buffer instead of string
             while True:
                 try:
                     # Non-blocking read from subprocess output
@@ -280,25 +253,36 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
                             )
                         break
 
-                    text = chunk.decode("utf-8")
-                    buffer += text
+                    buffer += chunk
 
                     # Process complete lines
-                    while "\n" in buffer:
-                        line, buffer = buffer.split("\n", 1)
-                        line = line.strip()
+                    while b"\n" in buffer:
+                        line, buffer = buffer.split(b"\n", 1)
                         if not line:
                             continue
 
-                        logger.debug(f"Subprocess raw output: {line}")
+                        # Try to decode with error handling
                         try:
-                            json_msg = json.loads(line)
-                            logger.info(
-                                f"Subprocess → Gateway: {json.dumps(json_msg)[:100]}..."
+                            line_str = line.decode("utf-8", errors="replace")
+                            line_str = line_str.strip()
+
+                            logger.debug(f"Subprocess raw output: {line_str}")
+
+                            if line_str:
+                                try:
+                                    json_msg = json.loads(line_str)
+                                    logger.info(
+                                        f"Subprocess → Gateway: {json.dumps(json_msg)[:100]}..."
+                                    )
+                                    await child_queue.put(json_msg)
+                                except json.JSONDecodeError:
+                                    logger.error(
+                                        f"Subprocess non-JSON output: {line_str}"
+                                    )
+                        except UnicodeDecodeError as ude:
+                            logger.warning(
+                                f"Cannot decode as UTF-8: {str(ude)}. Skipping binary data."
                             )
-                            await child_queue.put(json_msg)
-                        except json.JSONDecodeError:
-                            logger.error(f"Subprocess non-JSON output: {line}")
 
                 except Exception as e:
                     logger.error(f"Error reading subprocess output: {str(e)}")
@@ -325,7 +309,8 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
                             )
                         break
 
-                    text = chunk.decode("utf-8").strip()
+                    # Use error handling when decoding
+                    text = chunk.decode("utf-8", errors="replace").strip()
                     if text:
                         for line in text.split("\n"):
                             if line.strip():
@@ -445,59 +430,6 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
         sys.exit(1)
 
 
-def main():
-    parser = argparse.ArgumentParser(description="MCP stdio-to-ws Gateway")
-    parser.add_argument("--stdio", required=True, help="Subprocess command to start")
-    parser.add_argument(
-        "--gateway-url", required=True, help="Gateway URL to connect to"
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=0,
-        help="Local HTTP port, 0 means don't start local server",
-    )
-    parser.add_argument("--message-path", default="/ws", help="Local WebSocket path")
-    parser.add_argument("--enable-cors", action="store_true", help="Enable CORS")
-    parser.add_argument(
-        "--health-endpoint", action="append", default=[], help="Health check endpoint"
-    )
-    parser.add_argument(
-        "--server-name", default="local", help="Server name for registration"
-    )
-    parser.add_argument("--server-id", help="Server ID for registration (optional)")
-    parser.add_argument(
-        "--require-gateway",
-        action="store_true",
-        default=True,
-        help="Exit if unable to connect to gateway",
-    )
-    parser.add_argument(
-        "--log-level",
-        default="INFO",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        help="Logging level",
-    )
-
-    args = parser.parse_args()
-    setup_logger(level=args.log_level)
-
-    # Create arguments object
-    ws_args = StdioToWsArgs(
-        stdio_cmd=args.stdio,
-        gateway_url=args.gateway_url,
-        port=args.port,
-        message_path=args.message_path,
-        enable_cors=args.enable_cors,
-        health_endpoints=args.health_endpoint,
-        server_name=args.server_name,
-        server_id=args.server_id,
-        require_gateway=args.require_gateway,
-    )
-
+def main(args: StdioToWsArgs) -> None:
     # Run main function
-    asyncio.run(stdio_to_ws(ws_args))
-
-
-if __name__ == "__main__":
-    main()
+    asyncio.run(stdio_to_ws(args))
