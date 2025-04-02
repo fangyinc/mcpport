@@ -12,8 +12,9 @@ def setup_server_parser(parser):
     parser.add_argument(
         "--host",
         type=str,
-        default="::",
-        help="Host address to bind (default: '::' for both IPv6 and IPv4)",
+        default="0.0.0.0",
+        help="Host address to bind (default: '0.0.0.0'), You can set '::' for both IPv6"
+        " and IPv4",
     )
     parser.add_argument(
         "--port", type=int, default=8765, help="Port to bind (default: 8765)"

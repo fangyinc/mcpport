@@ -1,6 +1,6 @@
 [project]
 name = "mcpport"
-version = "0.1.1"
+version = "0.1.2"
 description = "mcpport — A lightweight gateway &amp; registry for Model Context Protocol (MCP), enabling standardized connectivity for AI applications."
 readme = "README.md"
 license = "MIT"
