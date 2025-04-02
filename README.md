@@ -19,7 +19,7 @@ It will start the gateway on port 8765 by default. And the common access points 
 2. Register your MCP Server to the Gateway
 
 ```bash
-ux mcpport register \
+uvx mcpport register \
 --stdio "npx -y @modelcontextprotocol/server-filesystem ./" \
 --gateway-url="ws://localhost:8765/mcp/register" \
 --server-name "file"
