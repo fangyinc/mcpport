@@ -16,6 +16,7 @@ class StdioToWsArgs:
         server_name: str = "mcp-stdio-gateway",
         server_id: Optional[str] = None,
         require_gateway: bool = True,
+        headers: Optional[dict] = None,
     ):
         self.stdio_cmd = stdio_cmd
         self.port = port
@@ -26,6 +27,7 @@ class StdioToWsArgs:
         self.server_name = server_name
         self.server_id = server_id
         self.require_gateway = require_gateway
+        self.headers = headers or {}
 
 
 @dataclass

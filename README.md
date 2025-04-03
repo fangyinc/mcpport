@@ -28,6 +28,29 @@ uvx mcpport register \
 It will register a MCP server named `file` to the gateway. The server is a simple file system server, which is implemented by `@modelcontextprotocol/server-filesystem`.
 
 
+## Authentication
+
+You can use `--auth-token` to set the auth token for the gateway.
+
+```bash
+uvx mcpport gateway --auth-token "my-token1" --auth-token "my-token2"
+```
+
+The default authentication method is `Bearer` token(Set to `Authorization` header). 
+
+If you set the auth token for the gateway, you need to set the same auth token for the MCP server when you register it.
+
+```bash
+uvx mcpport register \
+--stdio "npx -y @modelcontextprotocol/server-filesystem ./" \
+--gateway-url="ws://localhost:8765/mcp/register" \
+--server-name "file" \
+--header "Authorization: Bearer my-token1"
+```
+
+And you must set the auth token for SSE connections. You can set the auth token in the `Authorization` header.
+
+
 ## Advanced Usage
 
 1. Start Your MCP Gateway With `ipv6` Support
@@ -48,3 +71,4 @@ There are some options for the gateway:
 - `--timeout-run-tool` is the timeout to run the tool, default is `120s`.
 - `--sse-path` is the path of the event stream endpoint, default is `/sse`.
 - `--messages-path` is the path of the message endpoint, default is `/messages`.
+- `--auth-token` is the auth token for the gateway, (can be used multiple times).

@@ -12,20 +12,56 @@ from mcp.server.fastmcp.tools.base import Tool
 from mcp.server.sse import SseServerTransport
 from mcp.shared.version import SUPPORTED_PROTOCOL_VERSIONS
 from starlette.applications import Starlette
+from starlette.authentication import (
+    AuthCredentials,
+    AuthenticationBackend,
+    SimpleUser,
+)
+from starlette.middleware import Middleware
+from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.requests import Request
+from starlette.responses import Response
 from starlette.routing import Mount, Route, WebSocketRoute
 from starlette.websockets import WebSocket
 
 logger = logging.getLogger(__name__)
 
 
+class BearerAuthBackend(AuthenticationBackend):
+    def __init__(self, valid_tokens):
+        self.valid_tokens = valid_tokens
+
+    async def authenticate(self, request):
+        if "Authorization" not in request.headers:
+            return None
+
+        auth = request.headers["Authorization"]
+        try:
+            scheme, token = auth.split()
+            if scheme.lower() != "bearer":
+                return None
+
+            if token in self.valid_tokens:
+                # Return authentication credentials and user object
+                return AuthCredentials(["authenticated"]), SimpleUser(token)
+        except ValueError:
+            pass
+
+        return None
+
+
 class MCPGateway:
     def __init__(
-        self, gateway_host: str = "localhost", gateway_port: int = 8765, settings=None
+        self,
+        gateway_host: str = "localhost",
+        gateway_port: int = 8765,
+        settings=None,
+        auth_tokens: List[str] = None,
     ):
         self.gateway_host = gateway_host
         self.gateway_port = gateway_port
         self.settings = settings
+        self.auth_tokens = auth_tokens or []
 
         # Store registered MCP server connections
         self.registered_servers: Dict[str, Dict[str, Any]] = {}
@@ -57,6 +93,11 @@ class MCPGateway:
 
     async def handle_websocket(self, websocket: WebSocket):
         """Handle WebSocket connections from Starlette"""
+        if not websocket.user or not websocket.user.is_authenticated:
+            await websocket.close(code=1008, reason="Unauthorized")
+            logger.warning("Unauthorized WebSocket connection attempt")
+            return
+
         await websocket.accept()
         logger.debug("WebSocket connection accepted")
 
@@ -652,6 +693,10 @@ class MCPGateway:
 
         # Function to handle SSE requests
         async def handle_sse(request: Request) -> None:
+            # Check if the user is authenticated
+            if not request.user.is_authenticated:
+                # Return 401 Unauthorized
+                return Response("Unauthorized", status_code=401)
             async with sse.connect_sse(
                 request.scope,
                 request.receive,
@@ -672,6 +717,12 @@ class MCPGateway:
                 Mount(self.settings.message_path, app=sse.handle_post_message),
                 # Add WebSocket route for MCP server registration
                 WebSocketRoute("/mcp/register", endpoint=self.handle_websocket),
+            ],
+            middleware=[
+                Middleware(
+                    AuthenticationMiddleware,
+                    backend=BearerAuthBackend(self.auth_tokens),
+                )
             ],
         )
 

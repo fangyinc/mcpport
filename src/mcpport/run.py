@@ -1,9 +1,13 @@
 import argparse
 import asyncio
+import logging
+import os
 
 from mcpport.gateway import MCPGateway
 from mcpport.types import ServerSettings, StdioToWsArgs
 from mcpport.utils import setup_logger
+
+logger = logging.getLogger(__name__)
 
 
 def setup_server_parser(parser):
@@ -63,13 +67,21 @@ def setup_server_parser(parser):
         default="/messages/",
         help="Message endpoint path (default: /messages/)",
     )
+    parser.add_argument(
+        "--auth-token",
+        action="append",
+        dest="auth_tokens",
+        help="Add authorization token (can be used multiple times)",
+    )
 
 
 def setup_client_parser(parser):
     """Set up register command arguments."""
     parser.add_argument("--stdio", required=True, help="Subprocess command to start")
     parser.add_argument(
-        "--gateway-url", required=True, help="Gateway URL to connect to"
+        "--gateway-url",
+        default="ws://localhost:8765/mcp/register",
+        help="Gateway URL to connect to",
     )
     parser.add_argument(
         "--port",
@@ -98,6 +110,13 @@ def setup_client_parser(parser):
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         help="Logging level",
     )
+    parser.add_argument(
+        "--header",
+        action="append",
+        dest="headers",
+        default=[],
+        help="Add one or more headers (format: 'Key: Value'). Can be used multiple times.",
+    )
 
 
 def run_server(args):
@@ -118,9 +137,22 @@ def run_server(args):
     # Setup logging
     setup_logger(settings.log_level)
 
+    env_tokens = os.environ.get("MCP_GATEWAY_AUTH_TOKENS", "").split(",")
+    env_tokens = [token.strip() for token in env_tokens if token.strip()]
+    auth_tokens = args.auth_tokens or []
+    auth_tokens.extend(env_tokens)
+
+    if not auth_tokens:
+        logger.warning(
+            "Warning: No authentication tokens provided. Gateway will accept any token!"
+        )
+
     # Create the MCP gateway
     gateway = MCPGateway(
-        gateway_host=settings.host, gateway_port=settings.port, settings=settings
+        gateway_host=settings.host,
+        gateway_port=settings.port,
+        settings=settings,
+        auth_tokens=auth_tokens,
     )
 
     # Start the server (supports both SSE and WebSocket)
@@ -144,6 +176,7 @@ def run_client(args):
         server_name=args.server_name,
         server_id=args.server_id,
         require_gateway=args.require_gateway,
+        headers=args.headers,
     )
     client_main(ws_args)
 

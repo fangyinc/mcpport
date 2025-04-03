@@ -48,7 +48,11 @@ class GatewayClient:
     """Gateway client that handles communication with the upstream gateway"""
 
     def __init__(
-        self, gateway_url: str, server_name: str, server_id: Optional[str] = None
+        self,
+        gateway_url: str,
+        server_name: str,
+        server_id: Optional[str] = None,
+        headers: Optional[Dict[str, str]] = None,
     ):
         self.gateway_url = gateway_url
         self.server_name = server_name
@@ -58,6 +62,7 @@ class GatewayClient:
             str, Callable[[Any, Optional[str]], Awaitable[None]]
         ] = {}
         self.is_connected = False
+        self.headers = headers or {}
 
     def add_message_handler(
         self, name: str, handler: Callable[[Any, Optional[str]], Awaitable[None]]
@@ -100,7 +105,11 @@ class GatewayClient:
 
             # Use ping_interval and ping_timeout to keep the connection active
             async with websockets.connect(
-                self.gateway_url, ping_interval=5, ping_timeout=10, close_timeout=10
+                self.gateway_url,
+                ping_interval=5,
+                ping_timeout=10,
+                close_timeout=10,
+                additional_headers=self.headers,
             ) as websocket:
                 logger.info("Connected to gateway")
                 self.websocket = websocket
@@ -177,6 +186,13 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
     gateway_url = args.gateway_url
     server_name = args.server_name
     server_id = args.server_id
+    auth_headers = {}
+    if hasattr(args, "headers") and args.headers:
+        for header in args.headers:
+            if ":" in header:
+                key, value = header.split(":", 1)
+                auth_headers[key.strip()] = value.strip()
+                logger.info(f"Added header: {key.strip()} = {value.strip()}")
 
     # Log configuration information
     logger.info("Starting MCP stdio-to-ws Gateway (Modified Version):")
@@ -184,6 +200,8 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
     logger.info(f"  - Gateway URL: {gateway_url}")
     logger.info(f"  - Service name: {server_name}")
     logger.info(f"  - Service ID: {server_id or 'auto-generated'}")
+    if auth_headers:
+        logger.info(f"  - Auth headers: {', '.join(auth_headers.keys())}")
 
     if port > 0:
         logger.info(f"  - Local port: {port}")
@@ -194,7 +212,10 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
         )
 
     gateway_client = GatewayClient(
-        gateway_url=gateway_url, server_name=server_name, server_id=server_id
+        gateway_url=gateway_url,
+        server_name=server_name,
+        server_id=server_id,
+        headers=auth_headers,
     )
 
     # Create async subprocess
