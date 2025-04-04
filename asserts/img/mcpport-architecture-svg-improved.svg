@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#f8f9fa" />
+  
+  <!-- Define gradients for components -->
+  <defs>
+    <linearGradient id="clientGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8f4ff" />
+      <stop offset="100%" stop-color="#c7e2ff" />
+    </linearGradient>
+    
+    <linearGradient id="gatewayGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d9e9ff" />
+      <stop offset="100%" stop-color="#b0d0ff" />
+    </linearGradient>
+    
+    <linearGradient id="adapterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e0ffe8" />
+      <stop offset="100%" stop-color="#c0f0d0" />
+    </linearGradient>
+    
+    <linearGradient id="serverGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fafafa" />
+      <stop offset="100%" stop-color="#eeeeee" />
+    </linearGradient>
+    
+    <!-- Arrow markers with better sizing -->
+    <marker id="blueArrow" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3771c8" />
+    </marker>
+    
+    <marker id="blueArrowDashed" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3771c8" />
+    </marker>
+    
+    <marker id="greenArrow" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d8659" />
+    </marker>
+    
+    <marker id="greenArrowDashed" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d8659" />
+    </marker>
+    
+    <marker id="grayArrow" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555555" />
+    </marker>
+    
+    <marker id="grayArrowDashed" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555555" />
+    </marker>
+    
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Components -->
+  <!-- MCP Client Box -->
+  <rect x="100" y="150" width="250" height="150" rx="10" fill="url(#clientGradient)" stroke="#3771c8" stroke-width="2" filter="url(#shadow)" />
+  <text x="225" y="185" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="#2b5797">MCP Client</text>
+  <text x="225" y="215" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">(Claude Desktop, VSCode)</text>
+  <text x="225" y="245" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">Authenticated SSE Connection</text>
+  
+  <!-- MCPPort Gateway Box -->
+  <rect x="500" y="150" width="300" height="350" rx="10" fill="url(#gatewayGradient)" stroke="#3771c8" stroke-width="2" filter="url(#shadow)" />
+  <text x="650" y="185" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="#2b5797">MCPPort Gateway</text>
+  <text x="650" y="215" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">Central Gateway Service</text>
+  
+  <!-- Gateway Components -->
+  <rect x="525" y="235" width="250" height="70" rx="5" fill="#c0d6ff" stroke="#3771c8" stroke-width="1" />
+  <text x="650" y="280" text-anchor="middle" font-family="Arial" font-size="18" fill="#333">Authentication System</text>
+  
+  <rect x="525" y="315" width="250" height="70" rx="5" fill="#c0d6ff" stroke="#3771c8" stroke-width="1" />
+  <text x="650" y="360" text-anchor="middle" font-family="Arial" font-size="18" fill="#333">Server Registry</text>
+  
+  <rect x="525" y="395" width="250" height="70" rx="5" fill="#c0d6ff" stroke="#3771c8" stroke-width="1" />
+  <text x="650" y="440" text-anchor="middle" font-family="Arial" font-size="18" fill="#333">Tool Management</text>
+  
+  <!-- MCPPort Client Box -->
+  <rect x="500" y="560" width="300" height="150" rx="10" fill="url(#adapterGradient)" stroke="#2d8659" stroke-width="2" filter="url(#shadow)" />
+  <text x="650" y="595" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="#2d8659">MCPPort Client</text>
+  <text x="650" y="625" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">stdio-to-ws Adapter</text>
+  <text x="650" y="655" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">WebSocket + Authentication</text>
+  
+  <!-- Local MCP Server Box -->
+  <rect x="900" y="560" width="250" height="150" rx="10" fill="url(#serverGradient)" stroke="#555555" stroke-width="2" filter="url(#shadow)" />
+  <text x="1025" y="595" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="#333">Local MCP Server</text>
+  <text x="1025" y="625" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">stdio-based Server</text>
+  <text x="1025" y="655" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">Tool Implementation</text>
+
+  <!-- Connection Arrows -->
+  <!-- MCP Client to Gateway -->
+  <path d="M 350,200 L 490,200" stroke="#3771c8" stroke-width="2.5" fill="none" marker-end="url(#blueArrow)" />
+  <text x="420" y="185" text-anchor="middle" font-family="Arial" font-size="14" fill="#3771c8">HTTP/SSE with Authentication</text>
+  
+  <!-- Gateway to MCP Client -->
+  <path d="M 490,230 L 350,230" stroke="#3771c8" stroke-width="2.5" fill="none" marker-end="url(#blueArrowDashed)" stroke-dasharray="6,4" />
+  <text x="420" y="250" text-anchor="middle" font-family="Arial" font-size="14" fill="#3771c8">Response</text>
+  
+  <!-- MCPPort Client to Gateway (Registration) -->
+  <path d="M 650,560 L 650,510" stroke="#2d8659" stroke-width="2.5" fill="none" marker-end="url(#greenArrow)" />
+  <text x="750" y="535" text-anchor="middle" font-family="Arial" font-size="14" fill="#2d8659">WebSocket Registration</text>
+  <text x="750" y="553" text-anchor="middle" font-family="Arial" font-size="14" fill="#2d8659">with Bearer Token</text>
+  
+  <!-- Gateway to MCPPort Client (Tool Calls) -->
+  <path d="M 600,510 L 600,560" stroke="#2d8659" stroke-width="2.5" fill="none" marker-end="url(#greenArrowDashed)" stroke-dasharray="6,4" />
+  <text x="545" y="535" text-anchor="middle" font-family="Arial" font-size="14" fill="#2d8659">Tool Calls</text>
+  
+  <!-- MCPPort Client to Local MCP Server -->
+  <path d="M 800,605 L 890,605" stroke="#555555" stroke-width="2.5" fill="none" marker-end="url(#grayArrow)" />
+  <text x="845" y="585" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#555555">stdin</text>
+  <text x="845" y="600" text-anchor="middle" font-family="Arial" font-size="14" fill="#555555">JSON-RPC Messages</text>
+  
+  <!-- Local MCP Server to MCPPort Client -->
+  <path d="M 890,665 L 800,665" stroke="#555555" stroke-width="2.5" fill="none" marker-end="url(#grayArrowDashed)" stroke-dasharray="6,4" />
+  <text x="845" y="685" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#555555">stdout</text>
+  <text x="845" y="700" text-anchor="middle" font-family="Arial" font-size="14" fill="#555555">JSON-RPC Responses</text>
+  
+  <!-- Main Workflow Steps - With enhanced styling -->
+  <rect x="100" y="740" width="1000" height="50" rx="10" fill="#f0f8ff" stroke="#3771c8" stroke-width="1" filter="url(#shadow)" />
+  <text x="600" y="772" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#2b5797">
+    Main Workflow: 1. Client Registration → 2. Tool Discovery → 3. Tool Call → 4. Execution → 5. Result Forwarding
+  </text>
+</svg>

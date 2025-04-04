@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#f8f9fa" />
+  
+  <!-- Define gradients for components -->
+  <defs>
+    <linearGradient id="clientGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8f4ff" />
+      <stop offset="100%" stop-color="#c7e2ff" />
+    </linearGradient>
+    
+    <linearGradient id="gatewayGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d9e9ff" />
+      <stop offset="100%" stop-color="#b0d0ff" />
+    </linearGradient>
+    
+    <linearGradient id="adapterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e0ffe8" />
+      <stop offset="100%" stop-color="#c0f0d0" />
+    </linearGradient>
+    
+    <linearGradient id="serverGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fafafa" />
+      <stop offset="100%" stop-color="#eeeeee" />
+    </linearGradient>
+    
+    <linearGradient id="publicGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FDEDE1" />
+      <stop offset="100%" stop-color="#FADBC3" />
+    </linearGradient>
+    
+    <linearGradient id="privateGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e1edfd" />
+      <stop offset="100%" stop-color="#c3d5fa" />
+    </linearGradient>
+    
+    <!-- Arrow markers -->
+    <marker id="blueArrow" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3771c8" />
+    </marker>
+    
+    <marker id="greenArrow" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d8659" />
+    </marker>
+    
+    <marker id="grayArrow" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555555" />
+    </marker>
+    
+    <marker id="purpleArrow" viewBox="0 0 10 10" refX="9" refY="5" 
+            markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7952b3" />
+    </marker>
+    
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  
+  <!-- Internet & Network Zones -->
+  <rect x="50" y="80" width="1100" height="270" rx="10" fill="url(#publicGradient)" stroke="#d9730d" stroke-width="2" filter="url(#shadow)" />
+  <text x="120" y="110" font-family="Arial" font-size="18" font-weight="bold" fill="#d9730d">PUBLIC INTERNET</text>
+  
+  <!-- Private Networks -->
+  <rect x="50" y="420" width="500" height="320" rx="10" fill="url(#privateGradient)" stroke="#3771c8" stroke-width="2" filter="url(#shadow)" />
+  <text x="120" y="450" font-family="Arial" font-size="18" font-weight="bold" fill="#3771c8">PRIVATE NETWORK A</text>
+  
+  <rect x="650" y="420" width="500" height="320" rx="10" fill="url(#privateGradient)" stroke="#7952b3" stroke-width="2" filter="url(#shadow)" />
+  <text x="720" y="450" font-family="Arial" font-size="18" font-weight="bold" fill="#7952b3">PRIVATE NETWORK B</text>
+  
+  <!-- NAT/Firewalls -->
+  <rect x="50" y="380" width="500" height="30" rx="0" fill="#ff9966" stroke="#d9730d" stroke-width="2" />
+  <text x="300" y="400" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#fff">NAT / FIREWALL A</text>
+  
+  <rect x="650" y="380" width="500" height="30" rx="0" fill="#ff9966" stroke="#d9730d" stroke-width="2" />
+  <text x="900" y="400" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#fff">NAT / FIREWALL B</text>
+  
+  <!-- Client A - On left side of public internet -->
+  <rect x="100" y="150" width="200" height="120" rx="10" fill="url(#clientGradient)" stroke="#3771c8" stroke-width="2" filter="url(#shadow)" />
+  <text x="200" y="185" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#2b5797">MCP Client A</text>
+  <text x="200" y="210" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">Any Location</text>
+  
+  <!-- Client B - On right side of public internet -->
+  <rect x="900" y="150" width="200" height="120" rx="10" fill="url(#clientGradient)" stroke="#3771c8" stroke-width="2" filter="url(#shadow)" />
+  <text x="1000" y="185" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#2b5797">MCP Client B</text>
+  <text x="1000" y="210" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">Any Location</text>
+  
+  <!-- MCPPort Gateway in center of public internet -->
+  <rect x="500" y="130" width="200" height="180" rx="10" fill="url(#gatewayGradient)" stroke="#3771c8" stroke-width="2" filter="url(#shadow)" />
+  <text x="600" y="160" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#2b5797">MCPPort Gateway</text>
+  <text x="600" y="185" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">Central Service</text>
+  <text x="600" y="240" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">Server Registry</text>
+  <text x="600" y="270" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">Tool Management</text>
+  
+  <!-- Network A Components -->
+  <rect x="120" y="480" width="180" height="100" rx="10" fill="url(#adapterGradient)" stroke="#2d8659" stroke-width="2" filter="url(#shadow)" />
+  <text x="210" y="515" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#2d8659">MCPPort Client A</text>
+  <text x="210" y="540" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">Outbound Connection</text>
+  
+  <rect x="340" y="480" width="180" height="100" rx="10" fill="url(#serverGradient)" stroke="#555555" stroke-width="2" filter="url(#shadow)" />
+  <text x="430" y="515" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#333">Local MCP Server A</text>
+  <text x="430" y="540" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">stdio-based Server</text>
+  
+  <!-- Network B Components -->
+  <rect x="720" y="480" width="180" height="100" rx="10" fill="url(#adapterGradient)" stroke="#2d8659" stroke-width="2" filter="url(#shadow)" />
+  <text x="810" y="515" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#2d8659">MCPPort Client B</text>
+  <text x="810" y="540" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">Outbound Connection</text>
+  
+  <rect x="940" y="480" width="180" height="100" rx="10" fill="url(#serverGradient)" stroke="#555555" stroke-width="2" filter="url(#shadow)" />
+  <text x="1030" y="515" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#333">Local MCP Server B</text>
+  <text x="1030" y="540" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">stdio-based Server</text>
+  
+  <!-- Connection Arrows -->
+  <!-- Network A outbound connection -->
+  <path d="M 210,480 L 210,380 C 210,350 350,350 480,290 C 490,280 500,270 500,230 L 500,190" stroke="#2d8659" stroke-width="2.5" fill="none" marker-end="url(#greenArrow)" />
+  <text x="330" y="330" text-anchor="middle" font-family="Arial" font-size="14" fill="#2d8659">Outbound WebSocket</text>
+  
+  <!-- Network B outbound connection -->
+  <path d="M 810,480 L 810,380 C 810,350 700,350 580,290 C 570,280 560,270 560,230 L 560,190" stroke="#7952b3" stroke-width="2.5" fill="none" marker-end="url(#purpleArrow)" />
+  <text x="690" y="330" text-anchor="middle" font-family="Arial" font-size="14" fill="#7952b3">Outbound WebSocket</text>
+  
+  <!-- Client A to Gateway -->
+  <path d="M 300,190 L 490,190" stroke="#3771c8" stroke-width="2.5" fill="none" marker-end="url(#blueArrow)" />
+  <text x="390" y="170" text-anchor="middle" font-family="Arial" font-size="14" fill="#3771c8">Authenticated SSE</text>
+  
+  <!-- Client B to Gateway -->
+  <path d="M 900,190 L 710,190" stroke="#3771c8" stroke-width="2.5" fill="none" marker-end="url(#blueArrow)" />
+  <text x="810" y="170" text-anchor="middle" font-family="Arial" font-size="14" fill="#3771c8">Authenticated SSE</text>
+  
+  <!-- MCPPort Client to Local Server within Network A -->
+  <path d="M 300,530 L 340,530" stroke="#555555" stroke-width="2.5" fill="none" marker-end="url(#grayArrow)" />
+  <text x="320" y="510" text-anchor="middle" font-family="Arial" font-size="12" fill="#555555">stdin/stdout</text>
+  
+  <!-- MCPPort Client to Local Server within Network B -->
+  <path d="M 900,530 L 940,530" stroke="#555555" stroke-width="2.5" fill="none" marker-end="url(#grayArrow)" />
+  <text x="920" y="510" text-anchor="middle" font-family="Arial" font-size="12" fill="#555555">stdin/stdout</text>
+  
+  <!-- Cross-network client access arrows -->
+  <path d="M 300,170 C 400,50 800,50 900,170" stroke="#3771c8" stroke-width="2.5" stroke-dasharray="5,5" fill="none" marker-end="url(#blueArrow)" />
+  <text x="600" y="70" text-anchor="middle" font-family="Arial" font-size="14" fill="#3771c8">Cross-Network Tool Access</text>
+  
+  <!-- Workflow description -->
+  <rect x="100" y="620" width="1000" height="160" rx="10" fill="#f9f9f9" stroke="#555555" stroke-width="1" filter="url(#shadow)" />
+  <text x="600" y="650" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#333">NAT Traversal Workflow</text>
+  <text x="140" y="685" font-family="Arial" font-size="16" fill="#333">1. MCPPort Clients initiate outbound WebSocket connections from private networks to public Gateway</text>
+  <text x="140" y="715" font-family="Arial" font-size="16" fill="#333">2. Each Client registers its local MCP Server's tools with the Gateway</text>
+  <text x="140" y="745" font-family="Arial" font-size="16" fill="#333">3. MCP Clients from anywhere can connect to Gateway and use tools from any registered server</text>
+  <text x="140" y="775" font-family="Arial" font-size="16" fill="#333">4. Requests and responses are routed through existing connections, bypassing NAT/firewall restrictions</text>
+</svg>

@@ -50,6 +50,19 @@ uvx mcpport register \
 
 And you must set the auth token for SSE connections. You can set the auth token in the `Authorization` header.
 
+## Architecture
+
+The architecture of the MCP gateway is as follows:
+
+![architecture](./asserts/img/mcpport-architecture-svg-improved.svg)
+
+**NAT Traversal Architecture for Cross-Network MCP Tool Access**
+
+The MCPPort solution enables edge devices to seamlessly provide MCP services through secure NAT traversal. By establishing persistent bidirectional WebSocket connections between MCPPort Clients (running on edge devices) and the central MCPPort Gateway, the system creates secure tunnels that bypass firewall restrictions.
+
+
+![](./asserts/img//mcpport-nat-simplified.svg)
+
 
 ## Advanced Usage
 
