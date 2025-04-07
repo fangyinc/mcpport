@@ -109,7 +109,7 @@ Note: This is not safe and should only be used for testing purposes.
 
 You use your own CA cert to sign the server certificate. It is recommended if you not have a trusted CA cert.
 
-Fist, you need to generate a CA cert and sign the server certificate with it. We have a [script](https://github.com/fangyinc/mcpport/scripts/generate-certs.sh) to do this. You can find it in the `scripts` folder.
+Fist, you need to generate a CA cert and sign the server certificate with it. We have a [script](https://github.com/fangyinc/mcpport/blob/main/scripts/generate-certs.sh) to do this. You can find it in the `scripts` folder.
 
 ```bash
 ./scripts/generate-certs.sh --domain localhost
