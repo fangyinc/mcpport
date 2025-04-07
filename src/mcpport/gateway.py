@@ -32,6 +32,10 @@ class BearerAuthBackend(AuthenticationBackend):
         self.valid_tokens = valid_tokens
 
     async def authenticate(self, request):
+        if not self.valid_tokens:
+            # Return authentication credentials and user object
+            return AuthCredentials(["authenticated"]), SimpleUser("anonymous")
+
         if "Authorization" not in request.headers:
             return None
 
@@ -732,11 +736,23 @@ class MCPGateway:
         """Start server with integrated SSE and WebSocket"""
         app = self.create_starlette_app()
 
+        ssl_config = {}
+        if self.settings.ssl_enabled:
+            import ssl
+
+            ssl_config = {
+                "ssl_keyfile": self.settings.ssl_keyfile,
+                "ssl_certfile": self.settings.ssl_certfile,
+            }
+            if self.settings.ssl_ca_certs:
+                ssl_config["ssl_ca_certs"] = self.settings.ssl_ca_certs
+                ssl_config["ssl_cert_reqs"] = ssl.CERT_REQUIRED
         config = uvicorn.Config(
             app,
             host=self.settings.host,
             port=self.settings.port,
             log_level=self.settings.log_level.lower(),
+            **ssl_config,
         )
         # Add IPv6 dual-stack configuration
         if hasattr(self.settings, "ipv6") and self.settings.ipv6:

@@ -17,6 +17,7 @@ import asyncio
 import json
 import logging
 import signal
+import ssl
 import sys
 import threading
 import uuid
@@ -53,6 +54,7 @@ class GatewayClient:
         server_name: str,
         server_id: Optional[str] = None,
         headers: Optional[Dict[str, str]] = None,
+        ssl_context: Optional[ssl.SSLContext] = None,
     ):
         self.gateway_url = gateway_url
         self.server_name = server_name
@@ -63,6 +65,7 @@ class GatewayClient:
         ] = {}
         self.is_connected = False
         self.headers = headers or {}
+        self.ssl_context = ssl_context
 
     def add_message_handler(
         self, name: str, handler: Callable[[Any, Optional[str]], Awaitable[None]]
@@ -110,6 +113,7 @@ class GatewayClient:
                 ping_timeout=10,
                 close_timeout=10,
                 additional_headers=self.headers,
+                ssl=self.ssl_context,
             ) as websocket:
                 logger.info("Connected to gateway")
                 self.websocket = websocket
@@ -180,6 +184,8 @@ class GatewayClient:
 
 async def stdio_to_ws(args: StdioToWsArgs) -> None:
     """Main function that implements stdio to WebSocket forwarding"""
+    import ssl
+
     # Destructure arguments
     stdio_cmd = args.stdio_cmd
     port = args.port
@@ -187,6 +193,23 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
     server_name = args.server_name
     server_id = args.server_id
     auth_headers = {}
+    ssl_context = None
+
+    if not args.ssl_verify:
+        # Create an SSL context that does not verify certificates
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        logger.info("SSL certificate verification disabled")
+    elif args.ssl_ca_cert:
+        # Use custom CA certificate for verification
+        ssl_context = ssl.create_default_context(cafile=args.ssl_ca_cert)
+        logger.info(f"Using custom CA certificate: {args.ssl_ca_cert}")
+    elif args.gateway_url.startswith("wss://"):
+        # Use default SSL context for wss:// connections
+        ssl_context = ssl.create_default_context()
+        logger.info("Using default SSL context")
+
     if hasattr(args, "headers") and args.headers:
         for header in args.headers:
             if ":" in header:
@@ -205,7 +228,6 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
 
     if port > 0:
         logger.info(f"  - Local port: {port}")
-        logger.info(f"  - WebSocket path: {args.message_path}")
         logger.info(f"  - CORS enabled: {args.enable_cors}")
         logger.info(
             f"  - Health check endpoints: {', '.join(args.health_endpoints) if args.health_endpoints else '(none)'}"
@@ -216,6 +238,7 @@ async def stdio_to_ws(args: StdioToWsArgs) -> None:
         server_name=server_name,
         server_id=server_id,
         headers=auth_headers,
+        ssl_context=ssl_context,
     )
 
     # Create async subprocess

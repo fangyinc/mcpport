@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import importlib.metadata
 import logging
 import os
 
@@ -8,6 +9,10 @@ from mcpport.types import ServerSettings, StdioToWsArgs
 from mcpport.utils import setup_logger
 
 logger = logging.getLogger(__name__)
+try:
+    VERSION = importlib.metadata.version("mcpport")
+except importlib.metadata.PackageNotFoundError:
+    VERSION = "unknown"
 
 
 def setup_server_parser(parser):
@@ -73,6 +78,30 @@ def setup_server_parser(parser):
         dest="auth_tokens",
         help="Add authorization token (can be used multiple times)",
     )
+    parser.add_argument(
+        "--ssl-enabled",
+        action="store_true",
+        default=False,
+        help="Enable SSL (default: False)",
+    )
+    parser.add_argument(
+        "--ssl-keyfile",
+        type=str,
+        default=None,
+        help="Path to SSL private key file (required if --ssl-enabled is set)",
+    )
+    parser.add_argument(
+        "--ssl-certfile",
+        type=str,
+        default=None,
+        help="Path to SSL certificate file (required if --ssl-enabled is set)",
+    )
+    parser.add_argument(
+        "--ssl-ca-certs",
+        type=str,
+        default=None,
+        help="Path to CA certificates file (optional)",
+    )
 
 
 def setup_client_parser(parser):
@@ -89,7 +118,6 @@ def setup_client_parser(parser):
         default=0,
         help="Local HTTP port, 0 means don't start local server",
     )
-    parser.add_argument("--message-path", default="/ws", help="Local WebSocket path")
     parser.add_argument("--enable-cors", action="store_true", help="Enable CORS")
     parser.add_argument(
         "--health-endpoint", action="append", default=[], help="Health check endpoint"
@@ -117,6 +145,15 @@ def setup_client_parser(parser):
         default=[],
         help="Add one or more headers (format: 'Key: Value'). Can be used multiple times.",
     )
+    parser.add_argument(
+        "--no-ssl-verify",
+        dest="ssl_verify",
+        action="store_false",
+        help="Disable SSL certificate verification",
+    )
+    parser.add_argument(
+        "--ssl-ca-cert", help="Path to CA certificate bundle for verification"
+    )
 
 
 def run_server(args):
@@ -132,6 +169,10 @@ def run_server(args):
         ipv6=args.ipv6,
         timeout_rpc=args.timeout_rpc,
         timeout_run_tool=args.timeout_run_tool,
+        ssl_enabled=args.ssl_enabled,
+        ssl_keyfile=args.ssl_keyfile,
+        ssl_certfile=args.ssl_certfile,
+        ssl_ca_certs=args.ssl_ca_certs,
     )
 
     # Setup logging
@@ -170,22 +211,33 @@ def run_client(args):
         stdio_cmd=args.stdio,
         gateway_url=args.gateway_url,
         port=args.port,
-        message_path=args.message_path,
         enable_cors=args.enable_cors,
         health_endpoints=args.health_endpoint,
         server_name=args.server_name,
         server_id=args.server_id,
         require_gateway=args.require_gateway,
         headers=args.headers,
+        ssl_verify=args.ssl_verify,
+        ssl_ca_cert=args.ssl_ca_cert,
     )
     client_main(ws_args)
+
+
+def show_version():
+    """Display version information and exit."""
+    print(f"mcpport package version: {VERSION}")
+    print(f"MCP Gateway Tool v{VERSION}")
+    print(f"MCP Register Tool v{VERSION}")
+    exit(0)
 
 
 def main():
     """Main entry point with subcommands for gateway and register."""
     parser = argparse.ArgumentParser(description="MCP Gateway Tool")
+    parser.add_argument(
+        "--version", "-v", action="store_true", help="Show version information and exit"
+    )
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
-
     # Create gateway subcommand (former server)
     gateway_parser = subparsers.add_parser(
         "gateway", aliases=["g"], help="Run MCP gateway server"
@@ -202,6 +254,9 @@ def main():
 
     # Parse arguments and run appropriate function
     args = parser.parse_args()
+
+    if hasattr(args, "version") and args.version:
+        show_version()
 
     if not hasattr(args, "func"):
         parser.print_help()
